@@ -41,7 +41,7 @@ def updateCall(call_id, driver):
         con.close()
         return -1
     else:
-        cur.execute("UPDATE calls SET driver = ?, dispatch_time = ? WHERE id = ?", (driver, datetime.now().strftime("%B %d, %Y %I:%M%p"), call_id))
+        cur.execute("UPDATE calls SET driver = ?, dispatch_time = ? WHERE id = ?", (driver, datetime.now().strftime("%Y-%m-%d %H:%M:%S"), call_id))
         con.commit()
         con.close()
         return call_id
