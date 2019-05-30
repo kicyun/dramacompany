@@ -9,6 +9,10 @@ sqlite3 database.db < schema.sql
 ## 실행
 python3 drama.py
 
+## 테스트
+https://www.getpostman.com/
+(pytest 적용하고 싶었으나...)
+
 ## API 
 ### 가입
 /user/signup POST
@@ -24,7 +28,7 @@ python3 drama.py
 
 {
     "email" : passenger01@dramacompany.com",
-    "password" : "password",
+    "password" : "password"
 }
 
 ### 배차 요청 리스트
