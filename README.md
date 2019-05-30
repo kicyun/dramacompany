@@ -12,6 +12,7 @@ python3 drama.py
 ## API 
 ### 가입
 /signup POST
+
 {
     "email" : "passenger01@dramacompany.com",
     "password" : "password",
@@ -20,6 +21,7 @@ python3 drama.py
 
 ### 로그인
 /signin POST
+
 {
     "email" : passenger01@dramacompany.com",
     "password" : "password",
@@ -29,14 +31,16 @@ python3 drama.py
 /call/list GET
 
 ### 승객이 택시 배차 요청
-/call/passenger
+/call/passenger POST
+
 {
     "user_id" : 1
     "address" : "서울시 강남구"
 }
 
 ### 택시 기사가 배차 신청
-/call/driver
+/call/driver POST
+
 {
     "user_id" : 2
     "call_id" : 1
