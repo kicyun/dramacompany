@@ -11,7 +11,7 @@ python3 drama.py
 
 ## API 
 ### 가입
-/signup POST
+/user/signup POST
 
 {
     "email" : "passenger01@dramacompany.com",
@@ -20,7 +20,7 @@ python3 drama.py
 }
 
 ### 로그인
-/signin POST
+/user/signin POST
 
 {
     "email" : passenger01@dramacompany.com",

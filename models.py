@@ -19,7 +19,7 @@ def selectUserByEmail(email):
 def selectUserById(user_id):
     con = sql.connect("database.db")
     cur = con.cursor()
-    cur.execute("SELECT id, email,password,is_driver FROM users id = ?", user_id)
+    cur.execute("SELECT id, email,password,is_driver FROM users WHERE id = ?", [user_id])
     user = cur.fetchone()
     con.close()
     return user

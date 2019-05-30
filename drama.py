@@ -3,14 +3,15 @@ from flask import Flask, jsonify, request
 import models as dbHandler
 
 app = Flask(__name__)
+# utf8 처리
 app.config['JSON_AS_ASCII'] = False
 
 @app.route("/")
 def hello():
-    return "Hello World!"
+    return "Hello DramaCompany!"
 
 # 가입
-@app.route("/signup", methods=["POST"])
+@app.route("/user/signup", methods=["POST"])
 def signup():
     if request.method=='POST':
         email = request.json['email']
@@ -26,7 +27,7 @@ def signup():
             return jsonify(user_id=user[0]), 200
 
 # 로그인
-@app.route("/signin", methods=["POST"])
+@app.route("/user/signin", methods=["POST"])
 def signin():
     email = request.json['email']
     password = request.json['password']
@@ -49,13 +50,19 @@ def callList():
         return "배차 요청이 없습니다", 400
 
 # 승객이 택시 배차 요청
-# 인증 필요
+# 인증 필요 ㅠㅠ 
 @app.route("/call/passenger", methods=["POST"])
 def passengerCall():
     passenger = request.json['user_id']
     address = request.json['address']
-    dbHandler.insertCall(passenger, address)
-    return "배차요청하였습니다", 200
+    user = dbHandler.selectUserById(passenger)
+    # SQLAlchemy 쓸 껄 ㅠㅠ
+    # 승객인지 체크
+    if user and user[3] == 0:
+        dbHandler.insertCall(passenger, address)
+        return "배차요청하였습니다", 200
+    else:
+        return "승객이 아닙니다", 400
 
 # 택시 기사가 리스트 중에 원하는 요청에 대하여 배차 요청
 # 인증 필요
@@ -69,8 +76,13 @@ def driverDispatch():
         return "이미 배차되었습니다", 400
     else:
         # 배차된 기사가 없으면 성공
-        dbHandler.updateCall(call_id, driver)
-        return "배차완료되었습니다", 200
+        # 기사인지 체크
+        user = dbHandler.selectUserById(driver)
+        if user and user[3] == 1:
+            dbHandler.updateCall(call_id, driver)
+            return "배차완료되었습니다", 200
+        else:
+            return "택시 기사가 아닙니다", 400
 
 if __name__ == "__main__":
     app.run(debug=True)
