@@ -32,6 +32,9 @@ https://www.getpostman.com/
     "password" : "password"
 }
 
+### 로그아웃
+/user/signout POST
+
 ### 배차 요청 리스트
 /call/list GET
 
@@ -45,7 +48,6 @@ response LIST
 /call/passenger POST
 
 {
-    "user_id" : 1,
     "address" : "서울시 강남구"
 }
 
@@ -53,6 +55,5 @@ response LIST
 /call/driver POST
 
 {
-    "user_id" : 2,
     "call_id" : 1
 }

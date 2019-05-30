@@ -1,11 +1,12 @@
 #drama.py
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, session
 from werkzeug.security import generate_password_hash, check_password_hash
 import models as dbHandler
 
 app = Flask(__name__)
 # utf8 처리
 app.config['JSON_AS_ASCII'] = False
+app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
 @app.route("/")
 def hello():
@@ -25,6 +26,7 @@ def signup():
         else:
             dbHandler.insertUser(email, password, is_driver)
             user = dbHandler.selectUserByEmail(email)
+            session['user_id'] = user[0]
             return jsonify(user_id=user[0]), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -38,6 +40,7 @@ def signin():
         user = dbHandler.selectUserByEmail(email)
         if user and check_password_hash(user[2], password):
             # 성공
+            session['user_id'] = user[0]
             return jsonify(user_id=user[0]), 200
         else:
             # 에러
@@ -45,10 +48,22 @@ def signin():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# 로그아웃
+@app.route("/user/signout", methods=["POST"])
+def signout():
+    try:
+        session.pop("user_id", None)
+        return jsonify({'message': '로그아웃되었습니다'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 # 전체 배차 요청리스트
 @app.route("/call/list", methods=["GET"])
 def callList():
+    if not session.get('user_id'):
+        return jsonify({'error': '로그인해주세요'}), 400
     try:
+        userId = session['user_id']
         # driver 가 null 이면 배차되지 않은 것으로 클라이언트에서 처리하도록 설득..;;
         callList = dbHandler.selectCallList()
         return jsonify(list(callList)), 200
@@ -56,11 +71,12 @@ def callList():
         return jsonify({'error': str(e)}), 500
 
 # 승객이 택시 배차 요청
-# 인증 필요 ㅠㅠ 
 @app.route("/call/passenger", methods=["POST"])
 def passengerCall():
+    if not session.get('user_id'):
+        return jsonify({'error': '로그인해주세요'}), 400
     try:
-        passenger = request.json['user_id']
+        passenger = session['user_id']
         address = request.json['address']
         user = dbHandler.selectUserById(passenger)
         # SQLAlchemy 쓸 껄 ㅠㅠ
@@ -74,12 +90,13 @@ def passengerCall():
         return jsonify({'error': str(e)}), 500
 
 # 택시 기사가 리스트 중에 원하는 요청에 대하여 배차 요청
-# 인증 필요
 @app.route("/call/driver", methods=["POST"])
 def driverDispatch():
+    if not session.get('user_id'):
+        return jsonify({'error': '로그인해주세요'}), 400
     try:
         call_id = request.json['call_id']
-        driver = request.json['user_id']
+        driver = session['user_id']
         user = dbHandler.selectUserById(driver)
         # 기사인지 체크
         if user and user[3] == 1:
