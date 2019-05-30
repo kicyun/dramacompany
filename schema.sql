@@ -7,7 +7,7 @@ drop table if exists users;
 );
 
 
-drop table if exists requests:
+drop table if exists calls;
     create table calls (
     id integer primary key autoincrement,
     passenger integer not null,
