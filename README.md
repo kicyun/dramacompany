@@ -10,8 +10,9 @@ sqlite3 database.db < schema.sql
 python3 drama.py
 
 ## 테스트
+postman을 활요하여 테스트(pytest 적용하고 싶었으나...)
+
 https://www.getpostman.com/
-(pytest 적용하고 싶었으나...)
 
 ## API 
 ### 가입
