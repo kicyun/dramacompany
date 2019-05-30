@@ -8,7 +8,7 @@ drop table if exists users;
 
 
 drop table if exists requests:
-    create table requests (
+    create table calls (
     id integer primary key autoincrement,
     passenger integer not null,
     address text not null,

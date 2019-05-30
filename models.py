@@ -23,32 +23,32 @@ def selectUserById(user_id):
     con.close()
     return user
 
-def insertRequest(passenger, address):
+def insertCall(passenger, address):
     con = sql.connect("database.db")
     cur = con.cursor()
-    cur.execute("INSERT INTO requests (passenger, address) VALUES (?)", (passenger, address))
+    cur.execute("INSERT INTO calls (passenger, address) VALUES (?)", (passenger, address))
     con.commit()
     con.close()
 
-def updateRequest(request_id, driver):
+def updateCall(call_id, driver):
     con = sql.connect("database.db")
     cur = con.cursor()
-    cur.execute("UPDATE requests SET driver = ?, dispatch_time = ? WHERE id = ?", (driver, datetime('now', 'localtime'), request_id)
+    cur.execute("UPDATE calls SET driver = ?, dispatch_time = ? WHERE id = ?", (driver, datetime('now', 'localtime')), call_id)
     con.commit()
     con.close()
 
-def selectRequestList():
+def selectCallList():
     con = sql.connect("database.db")
     cur = con.cursor()
     cur.execute("SELECT id, passenger, address, driver, request_time, dispatch_time FROM users ORDER BY id DESC")
-    user = cur.fetchone()
+    user = cur.fetchall()
     con.close()
     return user
 
-def selectRequestById(request_id):
+def selectCallById(call_id):
     con = sql.connect("database.db")
     cur = con.cursor()
-    cur.execute("SELECT id, passenger, address, driver, request_time, dispatch_time FROM users WHERE id = ?", request_id)
+    cur.execute("SELECT id, passenger, address, driver, request_time, dispatch_time FROM users WHERE id = ?", call_id)
     user = cur.fetchone()
     con.close()
     return user
