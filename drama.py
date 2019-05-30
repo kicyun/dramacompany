@@ -51,10 +51,7 @@ def callList():
     try:
         # driver 가 null 이면 배차되지 않은 것으로 클라이언트에서 처리하도록 설득..;;
         callList = dbHandler.selectCallList()
-        if (callList):
-            return jsonify(list(callList)), 200
-        else:
-            return jsonify({'error': '배차 요청이 없습니다'}), 400
+        return jsonify(list(callList)), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
