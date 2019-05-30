@@ -35,6 +35,7 @@ https://www.getpostman.com/
 ### 배차 요청 리스트
 /call/list GET
 response LIST
+
 [ 
     call_id, passenger_id, address, driver_id(배차 안 되면 null), 배차요청시간, 배차완료시간(배차 안 되면 null)
 ]
