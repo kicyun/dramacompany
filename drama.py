@@ -14,75 +14,90 @@ def hello():
 # 가입
 @app.route("/user/signup", methods=["POST"])
 def signup():
-    email = request.json['email']
-    password = generate_password_hash(request.json['password'])
-    is_driver = request.json['is_driver']
-    user = dbHandler.selectUserByEmail(email)
-    if user:
-        # 동일 메일 존재 에러처리
-        return "이메일이 존재합니다", 400
-    else:
-        dbHandler.insertUser(email, password, is_driver)
+    try:
+        email = request.json['email']
+        password = generate_password_hash(request.json['password'])
+        is_driver = request.json['is_driver']
         user = dbHandler.selectUserByEmail(email)
-        return jsonify(user_id=user[0]), 200
+        if user:
+            # 동일 메일 존재 에러처리
+            return jsonify({'error':'이메일이 존재합니다'}), 400
+        else:
+            dbHandler.insertUser(email, password, is_driver)
+            user = dbHandler.selectUserByEmail(email)
+            return jsonify(user_id=user[0]), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 # 로그인
 @app.route("/user/signin", methods=["POST"])
 def signin():
-    email = request.json['email']
-    password = request.json['password']
-    user = dbHandler.selectUserByEmail(email)
-    if user and check_password_hash(user[2], password):
-        # 성공
-        return jsonify(user_id=user[0]), 200
-    else:
-        # 에러
-        return "로그인 실패", 400
+    try:
+        email = request.json['email']
+        password = request.json['password']
+        user = dbHandler.selectUserByEmail(email)
+        if user and check_password_hash(user[2], password):
+            # 성공
+            return jsonify(user_id=user[0]), 200
+        else:
+            # 에러
+            return jsonify({'error': '로그인 실패'}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 # 전체 배차 요청리스트
 @app.route("/call/list", methods=["GET"])
 def callList():
-    # driver 가 null 이면 배차되지 않은 것으로 클라이언트에서 처리하도록 설득..;;
-    callList = dbHandler.selectCallList()
-    if (callList):
-        return jsonify(list(callList)), 200
-    else:
-        return "배차 요청이 없습니다", 400
+    try:
+        # driver 가 null 이면 배차되지 않은 것으로 클라이언트에서 처리하도록 설득..;;
+        callList = dbHandler.selectCallList()
+        if (callList):
+            return jsonify(list(callList)), 200
+        else:
+            return jsonify({'error': '배차 요청이 없습니다'}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 # 승객이 택시 배차 요청
 # 인증 필요 ㅠㅠ 
 @app.route("/call/passenger", methods=["POST"])
 def passengerCall():
-    passenger = request.json['user_id']
-    address = request.json['address']
-    user = dbHandler.selectUserById(passenger)
-    # SQLAlchemy 쓸 껄 ㅠㅠ
-    # 승객인지 체크
-    if user and user[3] == 0:
-        dbHandler.insertCall(passenger, address)
-        return "배차요청하였습니다", 200
-    else:
-        return "승객이 아닙니다", 400
+    try:
+        passenger = request.json['user_id']
+        address = request.json['address']
+        user = dbHandler.selectUserById(passenger)
+        # SQLAlchemy 쓸 껄 ㅠㅠ
+        # 승객인지 체크
+        if user and user[3] == 0:
+            dbHandler.insertCall(passenger, address)
+            return jsonify({'message': '배차요청하였습니다'}), 200
+        else:
+            return jsonify({'error': '승객이 아닙니다'}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 # 택시 기사가 리스트 중에 원하는 요청에 대하여 배차 요청
 # 인증 필요
 @app.route("/call/driver", methods=["POST"])
 def driverDispatch():
-    call_id = request.json['call_id']
-    driver = request.json['user_id']
-    # 트랜잭션 필요 ㅠㅠ
-    call = dbHandler.selectCallById(call_id)
-    if call[3]:
-        return "이미 배차되었습니다", 400
-    else:
-        # 배차된 기사가 없으면 성공
-        # 기사인지 체크
-        user = dbHandler.selectUserById(driver)
-        if user and user[3] == 1:
-            dbHandler.updateCall(call_id, driver)
-            return "배차완료되었습니다", 200
+    try:
+        call_id = request.json['call_id']
+        driver = request.json['user_id']
+        # 트랜잭션 필요 ㅠㅠ
+        call = dbHandler.selectCallById(call_id)
+        if call[3]:
+            return "이미 배차되었습니다", 400
         else:
-            return "택시 기사가 아닙니다", 400
+            # 배차된 기사가 없으면 성공
+            # 기사인지 체크
+            user = dbHandler.selectUserById(driver)
+            if user and user[3] == 1:
+                dbHandler.updateCall(call_id, driver)
+                return jsonify({'message': '배차완료되었습니다'}), 200
+            else:
+                return jsonify({'error': '택시 기사가 아닙니다'}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)
