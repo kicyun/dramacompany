@@ -34,10 +34,17 @@ def insertCall(passenger, address):
 def updateCall(call_id, driver):
     con = sql.connect("database.db")
     cur = con.cursor()
-    cur.execute("UPDATE calls SET driver = ?, dispatch_time = ? WHERE id = ?", (driver, datetime.now().strftime("%B %d, %Y %I:%M%p"), call_id))
-    #cur.execute("UPDATE calls SET driver = ? WHERE id = ?", (driver, call_id))
-    con.commit()
-    con.close()
+    cur.execute("SELECT id, passenger, address, driver, request_time, dispatch_time FROM calls WHERE id = ?", [call_id])
+    call = cur.fetchone()
+    if call[3]:
+        # 이미 배차됨.
+        con.close()
+        return -1
+    else:
+        cur.execute("UPDATE calls SET driver = ?, dispatch_time = ? WHERE id = ?", (driver, datetime.now().strftime("%B %d, %Y %I:%M%p"), call_id))
+        con.commit()
+        con.close()
+        return call_id
 
 def selectCallList():
     con = sql.connect("database.db")

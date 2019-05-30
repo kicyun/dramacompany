@@ -83,19 +83,17 @@ def driverDispatch():
     try:
         call_id = request.json['call_id']
         driver = request.json['user_id']
-        # 트랜잭션 필요 ㅠㅠ
-        call = dbHandler.selectCallById(call_id)
-        if call[3]:
-            return "이미 배차되었습니다", 400
-        else:
+        user = dbHandler.selectUserById(driver)
+        # 기사인지 체크
+        if user and user[3] == 1:
             # 배차된 기사가 없으면 성공
-            # 기사인지 체크
-            user = dbHandler.selectUserById(driver)
-            if user and user[3] == 1:
-                dbHandler.updateCall(call_id, driver)
-                return jsonify({'message': '배차완료되었습니다'}), 200
+            ret = dbHandler.updateCall(call_id, driver)
+            if ret < 0:
+                return jsonify({'error': '이미 배차되었습니다'}), 400
             else:
-                return jsonify({'error': '택시 기사가 아닙니다'}), 400
+                return jsonify({'message': '배차완료되었습니다'}), 200
+        else:
+            return jsonify({'error': '택시 기사가 아닙니다'}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
