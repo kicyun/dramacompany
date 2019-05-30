@@ -34,7 +34,7 @@ python3 drama.py
 /call/passenger POST
 
 {
-    "user_id" : 1
+    "user_id" : 1,
     "address" : "서울시 강남구"
 }
 
@@ -42,6 +42,6 @@ python3 drama.py
 /call/driver POST
 
 {
-    "user_id" : 2
+    "user_id" : 2,
     "call_id" : 1
 }
