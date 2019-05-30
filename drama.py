@@ -1,5 +1,6 @@
 #drama.py
 from flask import Flask, jsonify, request
+from werkzeug.security import generate_password_hash, check_password_hash
 import models as dbHandler
 
 app = Flask(__name__)
@@ -13,18 +14,17 @@ def hello():
 # 가입
 @app.route("/user/signup", methods=["POST"])
 def signup():
-    if request.method=='POST':
-        email = request.json['email']
-        password = request.json['password']
-        is_driver = request.json['is_driver']
+    email = request.json['email']
+    password = generate_password_hash(request.json['password'])
+    is_driver = request.json['is_driver']
+    user = dbHandler.selectUserByEmail(email)
+    if user:
+        # 동일 메일 존재 에러처리
+        return "이메일이 존재합니다", 400
+    else:
+        dbHandler.insertUser(email, password, is_driver)
         user = dbHandler.selectUserByEmail(email)
-        if user:
-            # 동일 메일 존재 에러처리
-            return "이메일이 존재합니다", 400
-        else:
-            dbHandler.insertUser(email, password, is_driver)
-            user = dbHandler.selectUserByEmail(email)
-            return jsonify(user_id=user[0]), 200
+        return jsonify(user_id=user[0]), 200
 
 # 로그인
 @app.route("/user/signin", methods=["POST"])
@@ -32,7 +32,7 @@ def signin():
     email = request.json['email']
     password = request.json['password']
     user = dbHandler.selectUserByEmail(email)
-    if user and user[2] == password:
+    if user and check_password_hash(user[2], password):
         # 성공
         return jsonify(user_id=user[0]), 200
     else:
