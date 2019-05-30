@@ -37,7 +37,7 @@ def signin():
         return "로그인 실패", 400
 
 # 전체 배차 요청리스트
-@app.route("/call/list", methods=["POST"])
+@app.route("/call/list", methods=["GET"])
 def callList():
     # driver 가 null 이면 배차되지 않은 것으로 클라이언트에서 처리하도록 설득..;;
     callList = dbHandler.selectCallList()
