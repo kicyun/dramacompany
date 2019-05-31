@@ -21,7 +21,7 @@ https://www.getpostman.com/
 {
     "email" : "passenger01@dramacompany.com",
     "password" : "password",
-    "is_driver": 1
+    "is_driver": 0
 }
 
 ### 로그인
