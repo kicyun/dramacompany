@@ -1,5 +1,10 @@
 # dramacomany
+## python3 설치
+
+https://www.python.org/downloads/
+
 ## 환경 설정
+
 python3 -m venv venv
 
 pip3 install flask
